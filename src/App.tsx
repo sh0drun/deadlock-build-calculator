@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import type { Hero, Item } from './types';
 import { DeadlockAPI } from './services/deadlockApi';
 import { DPSCalculator } from './services/dpsCalculator';
+import { BuildStorage } from './services/buildStorage';
 import { HeroSelector } from './components/HeroSelector';
 import { ItemSelector } from './components/ItemSelector';
 import { DPSDisplay } from './components/DPSDisplay';
+import { BuildManager } from './components/BuildManager';
 import './App.css';
 
 function App() {
@@ -37,6 +39,24 @@ function App() {
         setWeaponData(weaponItems);
 
         console.log(`Loaded ${playableHeroes.length} playable heroes (${heroesData.length} total) and ${itemsData.length} items`);
+
+        // Check for build in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const buildParam = urlParams.get('build');
+        if (buildParam) {
+          const decoded = BuildStorage.decodeBuildFromURL(buildParam);
+          if (decoded) {
+            const hero = playableHeroes.find((h: Hero) => h.id === decoded.heroId);
+            const loadedItems = decoded.itemIds
+              .map(id => itemsData.find((item: Item) => item.id === id))
+              .filter((item): item is Item => item !== undefined);
+
+            if (hero) {
+              handleSelectHero(hero);
+              setSelectedItems(loadedItems);
+            }
+          }
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -68,6 +88,18 @@ function App() {
     setSelectedItems(selectedItems.filter(i => i.id !== item.id));
   };
 
+  const handleLoadBuild = (heroId: number, itemIds: number[]) => {
+    const hero = heroes.find(h => h.id === heroId);
+    const loadedItems = itemIds
+      .map(id => items.find(item => item.id === id))
+      .filter((item): item is Item => item !== undefined);
+
+    if (hero) {
+      handleSelectHero(hero);
+      setSelectedItems(loadedItems);
+    }
+  };
+
   // Calculate DPS
   const dpsResults = DPSCalculator.calculate(selectedHero, selectedItems);
 
@@ -86,6 +118,12 @@ function App() {
       ) : (
         <div className="app-content">
           <div className="left-panel">
+            <BuildManager
+              selectedHero={selectedHero}
+              selectedItems={selectedItems}
+              onLoadBuild={handleLoadBuild}
+            />
+
             <HeroSelector
               heroes={heroes}
               selectedHero={selectedHero}

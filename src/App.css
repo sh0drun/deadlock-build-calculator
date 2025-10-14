@@ -815,6 +815,228 @@
   font-size: 1.2rem;
 }
 
+/* Build Manager */
+.build-manager {
+  background: #2a2a2a;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.build-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  flex: 1;
+  min-width: 100px;
+  padding: 0.5rem 1rem;
+  background: #444;
+  color: #fff;
+  border: 2px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.action-button:hover:not(:disabled) {
+  background: #555;
+  border-color: #ff9500;
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dialog */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.dialog {
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-width: 400px;
+  max-width: 90vw;
+  border: 2px solid #444;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.dialog.large {
+  min-width: 600px;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.dialog h3 {
+  margin: 0 0 1rem 0;
+  color: #ff9500;
+  font-size: 1.2rem;
+}
+
+.dialog p {
+  margin: 0 0 0.75rem 0;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.build-name-input,
+.share-url-input {
+  width: 100%;
+  padding: 0.5rem;
+  background: #1a1a1a;
+  border: 2px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.build-name-input:focus,
+.share-url-input:focus {
+  outline: none;
+  border-color: #ff9500;
+}
+
+.share-url-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.share-url-container input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.share-url-container button {
+  padding: 0.5rem 1rem;
+  background: #ff9500;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.dialog-actions button {
+  padding: 0.5rem 1rem;
+  background: #444;
+  color: #fff;
+  border: 2px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.dialog-actions button:hover {
+  background: #555;
+  border-color: #ff9500;
+}
+
+.dialog-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Builds List */
+.builds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.no-builds {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}
+
+.build-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #333;
+  border-radius: 6px;
+  border: 2px solid #444;
+  transition: all 0.2s;
+}
+
+.build-item:hover {
+  border-color: #555;
+  background: #3a3a3a;
+}
+
+.build-info {
+  flex: 1;
+}
+
+.build-name {
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.build-meta {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.build-actions-inline {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.build-actions-inline button {
+  padding: 0.4rem 0.75rem;
+  background: #444;
+  color: #fff;
+  border: 2px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.build-actions-inline button:hover {
+  background: #555;
+  border-color: #ff9500;
+}
+
+.build-actions-inline button.delete-btn:hover {
+  background: #f44336;
+  border-color: #f44336;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .app-content {
