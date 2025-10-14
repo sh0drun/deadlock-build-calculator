@@ -7,13 +7,16 @@ interface ItemSelectorProps {
   selectedItems: Item[];
   onAddItem: (item: Item) => void;
   onRemoveItem: (item: Item) => void;
+  onReorderItems: (items: Item[]) => void;
   loading?: boolean;
 }
 
-export function ItemSelector({ items, selectedItems, onAddItem, onRemoveItem, loading }: ItemSelectorProps) {
+export function ItemSelector({ items, selectedItems, onAddItem, onRemoveItem, onReorderItems, loading }: ItemSelectorProps) {
   const [filter, setFilter] = useState<'all' | 'weapon' | 'vitality' | 'spirit'>('all');
   const [tierFilter, setTierFilter] = useState<number | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const tierToRoman = (tier: number): string => {
     const romanNumerals = ['I', 'II', 'III', 'IV'];
@@ -44,6 +47,62 @@ export function ItemSelector({ items, selectedItems, onAddItem, onRemoveItem, lo
 
   const getTotalCost = () => {
     return selectedItems.reduce((sum, item) => sum + item.cost, 0);
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null) return;
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+
+    // Create a sparse array representation
+    const itemsBySlot: { [key: number]: Item } = {};
+    selectedItems.forEach((item, index) => {
+      itemsBySlot[index] = item;
+    });
+
+    const draggedItem = itemsBySlot[draggedIndex];
+    const targetItem = itemsBySlot[dropIndex];
+
+    // Swap the items
+    if (draggedItem) {
+      delete itemsBySlot[draggedIndex];
+      itemsBySlot[dropIndex] = draggedItem;
+    }
+
+    if (targetItem) {
+      itemsBySlot[draggedIndex] = targetItem;
+    }
+
+    // Convert back to array maintaining order
+    const newItems: Item[] = [];
+    for (let i = 0; i < 12; i++) {
+      if (itemsBySlot[i]) {
+        newItems.push(itemsBySlot[i]);
+      }
+    }
+
+    onReorderItems(newItems);
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   const getItemStats = (item: Item) => {
@@ -79,15 +138,34 @@ export function ItemSelector({ items, selectedItems, onAddItem, onRemoveItem, lo
         <div className="selected-items-list">
           {Array.from({ length: 12 }).map((_, index) => {
             const item = selectedItems[index];
+            const isDragging = draggedIndex === index;
+            const isDragOver = dragOverIndex === index;
+
             return item ? (
-              <div key={item.id} className="selected-item-card filled" title={item.name}>
+              <div
+                key={item.id}
+                className={`selected-item-card filled ${isDragging ? 'dragging' : ''} ${isDragOver ? 'drag-over' : ''}`}
+                title={item.name}
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+              >
                 <div className="slot-number">{index + 1}</div>
                 <img src={item.shop_image_small} alt={item.name} />
                 <button onClick={() => onRemoveItem(item)} className="remove-btn">×</button>
                 <div className="selected-item-name">{item.name}</div>
               </div>
             ) : (
-              <div key={`empty-${index}`} className="selected-item-card empty">
+              <div
+                key={`empty-${index}`}
+                className={`selected-item-card empty ${isDragOver ? 'drag-over' : ''}`}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, index)}
+              >
                 <div className="slot-number empty-slot">{index + 1}</div>
               </div>
             );

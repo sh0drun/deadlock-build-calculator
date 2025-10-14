@@ -79,13 +79,17 @@ function App() {
   };
 
   const handleAddItem = (item: Item) => {
-    if (selectedItems.length < 12) {
+    if (selectedItems.length < 12 && !selectedItems.find(i => i.id === item.id)) {
       setSelectedItems([...selectedItems, item]);
     }
   };
 
   const handleRemoveItem = (item: Item) => {
     setSelectedItems(selectedItems.filter(i => i.id !== item.id));
+  };
+
+  const handleReorderItems = (newItems: Item[]) => {
+    setSelectedItems(newItems);
   };
 
   const handleLoadBuild = (heroId: number, itemIds: number[]) => {
@@ -145,6 +149,7 @@ function App() {
                 selectedItems={selectedItems}
                 onAddItem={handleAddItem}
                 onRemoveItem={handleRemoveItem}
+                onReorderItems={handleReorderItems}
               />
             ) : (
               <div className="no-hero-selected">

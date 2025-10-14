@@ -335,9 +335,32 @@
   overflow: visible;
   border: 2px solid #555;
   transition: all 0.3s ease;
+  cursor: grab;
 }
 
-.selected-item-card.filled:hover {
+.selected-item-card.filled:active {
+  cursor: grabbing;
+}
+
+.selected-item-card.filled.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+  cursor: grabbing;
+}
+
+.selected-item-card.drag-over {
+  border-color: #ff9500;
+  background: rgba(255, 149, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.selected-item-card.empty.drag-over {
+  background: rgba(255, 149, 0, 0.15);
+  border-color: #ff9500;
+  border-style: solid;
+}
+
+.selected-item-card.filled:hover:not(.dragging) {
   border-color: #ff9500;
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
