@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import type { Hero, Item } from '../types';
 import { BuildStorage, type SavedBuild } from '../services/buildStorage';
 
@@ -8,7 +8,7 @@ interface BuildManagerProps {
   onLoadBuild: (heroId: number, itemIds: number[]) => void;
 }
 
-export function BuildManager({ selectedHero, selectedItems, onLoadBuild }: BuildManagerProps) {
+export const BuildManager = memo(function BuildManager({ selectedHero, selectedItems, onLoadBuild }: BuildManagerProps) {
   const [savedBuilds, setSavedBuilds] = useState<SavedBuild[]>([]);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
@@ -16,36 +16,36 @@ export function BuildManager({ selectedHero, selectedItems, onLoadBuild }: Build
   const [buildName, setBuildName] = useState('');
   const [shareURL, setShareURL] = useState('');
 
-  useEffect(() => {
-    loadBuilds();
+  const loadBuilds = useCallback(() => {
+    setSavedBuilds(BuildStorage.getAllBuilds());
   }, []);
 
-  const loadBuilds = () => {
-    setSavedBuilds(BuildStorage.getAllBuilds());
-  };
+  useEffect(() => {
+    loadBuilds();
+  }, [loadBuilds]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (!selectedHero || !buildName.trim()) return;
 
     BuildStorage.saveBuild(buildName, selectedHero, selectedItems);
     setBuildName('');
     setShowSaveDialog(false);
     loadBuilds();
-  };
+  }, [selectedHero, buildName, selectedItems, loadBuilds]);
 
-  const handleLoad = (build: SavedBuild) => {
+  const handleLoad = useCallback((build: SavedBuild) => {
     onLoadBuild(build.heroId, build.itemIds);
     setShowLoadDialog(false);
-  };
+  }, [onLoadBuild]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = useCallback((id: string) => {
     if (confirm('Are you sure you want to delete this build?')) {
       BuildStorage.deleteBuild(id);
       loadBuilds();
     }
-  };
+  }, [loadBuilds]);
 
-  const handleShare = () => {
+  const handleShare = useCallback(() => {
     if (!selectedHero) return;
 
     const encoded = BuildStorage.encodeBuildToURL(
@@ -55,14 +55,14 @@ export function BuildManager({ selectedHero, selectedItems, onLoadBuild }: Build
     const url = `${window.location.origin}${window.location.pathname}?build=${encoded}`;
     setShareURL(url);
     setShowShareDialog(true);
-  };
+  }, [selectedHero, selectedItems]);
 
-  const handleCopyURL = () => {
+  const handleCopyURL = useCallback(() => {
     navigator.clipboard.writeText(shareURL);
     alert('Build URL copied to clipboard!');
-  };
+  }, [shareURL]);
 
-  const handleExport = (build: SavedBuild) => {
+  const handleExport = useCallback((build: SavedBuild) => {
     const json = BuildStorage.exportBuildToJSON(build);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -71,9 +71,9 @@ export function BuildManager({ selectedHero, selectedItems, onLoadBuild }: Build
     a.download = `${build.name.replace(/[^a-z0-9]/gi, '_')}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  };
+  }, []);
 
-  const handleImport = () => {
+  const handleImport = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -96,7 +96,7 @@ export function BuildManager({ selectedHero, selectedItems, onLoadBuild }: Build
       reader.readAsText(file);
     };
     input.click();
-  };
+  }, [loadBuilds, onLoadBuild]);
 
   return (
     <div className="build-manager">
@@ -202,4 +202,4 @@ export function BuildManager({ selectedHero, selectedItems, onLoadBuild }: Build
       )}
     </div>
   );
-}
+});

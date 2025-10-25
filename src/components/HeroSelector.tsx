@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Hero } from '../types';
 
 interface HeroSelectorProps {
@@ -7,7 +8,7 @@ interface HeroSelectorProps {
   loading?: boolean;
 }
 
-export function HeroSelector({ heroes, selectedHero, onSelectHero, loading }: HeroSelectorProps) {
+export const HeroSelector = memo(function HeroSelector({ heroes, selectedHero, onSelectHero, loading }: HeroSelectorProps) {
   if (loading) {
     return <div className="hero-selector loading">Loading heroes...</div>;
   }
@@ -46,4 +47,4 @@ export function HeroSelector({ heroes, selectedHero, onSelectHero, loading }: He
       )}
     </div>
   );
-}
+});

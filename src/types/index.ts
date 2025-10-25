@@ -101,3 +101,11 @@ export interface DPSCalculation {
   burstDamage: number;
   sustainedDPS: number;
 }
+
+// Weapon item from API
+export interface WeaponItem {
+  id: number;
+  hero?: number;
+  heroes?: number[];
+  weapon_info?: WeaponInfo;
+}

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { DPSCalculation } from '../types';
 
 interface DPSDisplayProps {
@@ -5,7 +6,7 @@ interface DPSDisplayProps {
   heroName?: string;
 }
 
-export function DPSDisplay({ dps, heroName }: DPSDisplayProps) {
+export const DPSDisplay = memo(function DPSDisplay({ dps, heroName }: DPSDisplayProps) {
   return (
     <div className="dps-display">
       <h2>DPS Calculator {heroName && `- ${heroName}`}</h2>
@@ -74,4 +75,4 @@ export function DPSDisplay({ dps, heroName }: DPSDisplayProps) {
       </div>
     </div>
   );
-}
+});

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import type { Item } from '../types';
 import { ItemTooltip } from './ItemTooltip';
 
@@ -27,43 +27,45 @@ export function ItemSelector({ items, selectedItems, onAddItem, onRemoveItem, on
     return <div className="item-selector loading">Loading items...</div>;
   }
 
-  // Filter items
-  const filteredItems = items
-    .filter((item) => {
-      const matchesSlotType = filter === 'all' || item.item_slot_type === filter;
-      const matchesTier = tierFilter === 'all' || item.item_tier === tierFilter;
-      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const notSelected = !selectedItems.find(si => si.id === item.id);
-      return matchesSlotType && matchesTier && matchesSearch && notSelected;
-    })
-    .sort((a, b) => {
-      // Sort by tier first (ascending: 1, 2, 3, 4)
-      if (a.item_tier !== b.item_tier) {
-        return a.item_tier - b.item_tier;
-      }
-      // Then by name alphabetically
-      return a.name.localeCompare(b.name);
-    });
+  // Filter items - memoized to prevent unnecessary recalculations
+  const filteredItems = useMemo(() => {
+    return items
+      .filter((item) => {
+        const matchesSlotType = filter === 'all' || item.item_slot_type === filter;
+        const matchesTier = tierFilter === 'all' || item.item_tier === tierFilter;
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const notSelected = !selectedItems.find(si => si.id === item.id);
+        return matchesSlotType && matchesTier && matchesSearch && notSelected;
+      })
+      .sort((a, b) => {
+        // Sort by tier first (ascending: 1, 2, 3, 4)
+        if (a.item_tier !== b.item_tier) {
+          return a.item_tier - b.item_tier;
+        }
+        // Then by name alphabetically
+        return a.name.localeCompare(b.name);
+      });
+  }, [items, filter, tierFilter, searchTerm, selectedItems]);
 
-  const getTotalCost = () => {
+  const totalCost = useMemo(() => {
     return selectedItems.reduce((sum, item) => sum + item.cost, 0);
-  };
+  }, [selectedItems]);
 
-  const handleDragStart = (index: number) => {
+  const handleDragStart = useCallback((index: number) => {
     setDraggedIndex(index);
-  };
+  }, []);
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
+  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
     e.preventDefault();
     if (draggedIndex === null) return;
     setDragOverIndex(index);
-  };
+  }, [draggedIndex]);
 
-  const handleDragLeave = () => {
+  const handleDragLeave = useCallback(() => {
     setDragOverIndex(null);
-  };
+  }, []);
 
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+  const handleDrop = useCallback((e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === dropIndex) return;
 
@@ -98,12 +100,12 @@ export function ItemSelector({ items, selectedItems, onAddItem, onRemoveItem, on
 
     setDraggedIndex(null);
     setDragOverIndex(null);
-  };
+  }, [draggedIndex, selectedItems, onReorderItems]);
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     setDraggedIndex(null);
     setDragOverIndex(null);
-  };
+  }, []);
 
   const getItemStats = (item: Item) => {
     const stats: string[] = [];
@@ -172,7 +174,7 @@ export function ItemSelector({ items, selectedItems, onAddItem, onRemoveItem, on
           })}
         </div>
         <div className="total-cost">
-          <strong>Total Cost: {getTotalCost()} souls</strong>
+          <strong>Total Cost: {totalCost} souls</strong>
         </div>
       </div>
 
