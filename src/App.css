@@ -1954,3 +1954,109 @@
   height: 40px;
   margin-bottom: 0.5rem;
 }
+
+/* Ability Display */
+.ability-display {
+  background: #2a2a2a;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.ability-display h2 {
+  margin: 0 0 1rem 0;
+  color: #ff9500;
+  font-size: 1.3rem;
+}
+
+.abilities-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ability-card {
+  background: #1a1a1a;
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s;
+}
+
+.ability-card:hover {
+  border-color: #ff9500;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);
+}
+
+.ability-header {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  align-items: flex-start;
+}
+
+.ability-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  border: 2px solid #ff9500;
+  flex-shrink: 0;
+}
+
+.ability-title h3 {
+  margin: 0 0 0.25rem 0;
+  color: #ff9500;
+  font-size: 1.1rem;
+}
+
+.ability-desc {
+  margin: 0;
+  color: #aaa;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.ability-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.ability-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background: #2a2a2a;
+  border-radius: 6px;
+}
+
+.ability-stat.highlighted {
+  background: rgba(255, 149, 0, 0.1);
+  border: 1px solid #ff9500;
+}
+
+.ability-stat .stat-label {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.ability-stat .stat-value {
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.ability-stat .stat-value.damage {
+  color: #ff6666;
+}
+
+.ability-stat .stat-value.cooldown {
+  color: #66aaff;
+}
+
+.stat-scaling {
+  color: #4CAF50;
+  font-size: 0.8rem;
+  margin-left: 0.25rem;
+}

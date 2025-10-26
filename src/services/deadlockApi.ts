@@ -1,4 +1,4 @@
-import type { Hero, Item } from '../types';
+import type { Hero, Item, Ability } from '../types';
 
 const API_BASE_URL = 'https://assets.deadlock-api.com/v2';
 
@@ -77,5 +77,37 @@ export class DeadlockAPI {
    */
   static async getItemsByTier(items: Item[], tier: number): Promise<Item[]> {
     return items.filter(item => item.item_tier === tier);
+  }
+
+  /**
+   * Fetch a specific ability by class_name
+   */
+  static async getAbility(className: string): Promise<Ability> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/items/${className}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ability ${className}: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error fetching ability ${className}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch multiple abilities by class_names
+   */
+  static async getAbilities(classNames: string[]): Promise<Ability[]> {
+    try {
+      const abilities = await Promise.all(
+        classNames.map(className => this.getAbility(className))
+      );
+      return abilities;
+    } catch (error) {
+      console.error('Error fetching abilities:', error);
+      throw error;
+    }
   }
 }

@@ -81,6 +81,16 @@ export interface Hero {
   weapon_info?: WeaponInfo;
   recommended_upgrades?: string[];
   complexity: number;
+  items?: {
+    signature1?: string;
+    signature2?: string;
+    signature3?: string;
+    signature4?: string;
+    [key: string]: string | undefined;
+  };
+  player_selectable?: boolean;
+  disabled?: boolean;
+  in_development?: boolean;
 }
 
 // Application State Types
@@ -108,4 +118,48 @@ export interface WeaponItem {
   hero?: number;
   heroes?: number[];
   weapon_info?: WeaponInfo;
+}
+
+// Ability scaling function
+export interface ScaleFunction {
+  class_name: string;
+  subclass_name?: string;
+  specific_stat_scale_type?: string;
+  stat_scale?: number;
+  scaling_stats?: string[];
+}
+
+// Ability property
+export interface AbilityProperty {
+  value: number | string;
+  label?: string;
+  postfix?: string;
+  prefix?: string;
+  css_class?: string;
+  scale_function?: ScaleFunction;
+  icon?: string;
+}
+
+// Ability from API
+export interface Ability {
+  id: number;
+  class_name: string;
+  name: string;
+  hero: number;
+  heroes?: number[];
+  image?: string;
+  image_webp?: string;
+  start_trained: boolean;
+  description?: {
+    desc?: string;
+  };
+  properties: {
+    Damage?: AbilityProperty;
+    DamagePerSecond?: AbilityProperty;
+    AbilityCooldown?: AbilityProperty;
+    AbilityCastRange?: AbilityProperty;
+    AbilityDuration?: AbilityProperty;
+    AbilityCharges?: AbilityProperty;
+    [key: string]: AbilityProperty | undefined;
+  };
 }
