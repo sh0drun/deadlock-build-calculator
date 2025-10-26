@@ -11,6 +11,7 @@ import { StatsDisplay } from './components/StatsDisplay';
 import { BuildManager } from './components/BuildManager';
 import { ErrorState } from './components/ErrorState';
 import { BuildComparison } from './components/BuildComparison';
+import { useToast } from './components/ToastContainer';
 import './App.css';
 
 interface BuildToCompare {
@@ -20,6 +21,7 @@ interface BuildToCompare {
 }
 
 function App() {
+  const toast = useToast();
   const [heroes, setHeroes] = useState<Hero[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [selectedHero, setSelectedHero] = useState<Hero | null>(null);
@@ -138,7 +140,8 @@ function App() {
       items: [...selectedItems],
       name: buildName
     }]);
-  }, [selectedHero, selectedItems, buildsToCompare.length]);
+    toast.success(`Added "${buildName}" to comparison!`);
+  }, [selectedHero, selectedItems, buildsToCompare.length, toast]);
 
   const handleRemoveFromComparison = useCallback((index: number) => {
     setBuildsToCompare(prev => prev.filter((_, idx) => idx !== index));
@@ -155,7 +158,8 @@ function App() {
   const handleClearComparison = useCallback(() => {
     setBuildsToCompare([]);
     setShowComparison(false);
-  }, []);
+    toast.info('Comparison cleared');
+  }, [toast]);
 
   return (
     <div className="app">

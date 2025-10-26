@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import type { Hero, Item } from '../types';
 import { BuildStorage, type SavedBuild } from '../services/buildStorage';
+import { useToast } from './ToastContainer';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface BuildManagerProps {
   selectedHero: Hero | null;
@@ -9,12 +11,14 @@ interface BuildManagerProps {
 }
 
 export const BuildManager = memo(function BuildManager({ selectedHero, selectedItems, onLoadBuild }: BuildManagerProps) {
+  const toast = useToast();
   const [savedBuilds, setSavedBuilds] = useState<SavedBuild[]>([]);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [buildName, setBuildName] = useState('');
   const [shareURL, setShareURL] = useState('');
+  const [buildToDelete, setBuildToDelete] = useState<SavedBuild | null>(null);
 
   const loadBuilds = useCallback(() => {
     setSavedBuilds(BuildStorage.getAllBuilds());
@@ -31,19 +35,34 @@ export const BuildManager = memo(function BuildManager({ selectedHero, selectedI
     setBuildName('');
     setShowSaveDialog(false);
     loadBuilds();
-  }, [selectedHero, buildName, selectedItems, loadBuilds]);
+    toast.success(`Build "${buildName}" saved successfully!`);
+  }, [selectedHero, buildName, selectedItems, loadBuilds, toast]);
 
   const handleLoad = useCallback((build: SavedBuild) => {
     onLoadBuild(build.heroId, build.itemIds);
     setShowLoadDialog(false);
-  }, [onLoadBuild]);
+    toast.success(`Build "${build.name}" loaded!`);
+  }, [onLoadBuild, toast]);
 
   const handleDelete = useCallback((id: string) => {
-    if (confirm('Are you sure you want to delete this build?')) {
-      BuildStorage.deleteBuild(id);
-      loadBuilds();
+    const build = savedBuilds.find(b => b.id === id);
+    if (build) {
+      setBuildToDelete(build);
     }
-  }, [loadBuilds]);
+  }, [savedBuilds]);
+
+  const confirmDelete = useCallback(() => {
+    if (buildToDelete) {
+      BuildStorage.deleteBuild(buildToDelete.id);
+      loadBuilds();
+      toast.success(`Build "${buildToDelete.name}" deleted`);
+      setBuildToDelete(null);
+    }
+  }, [buildToDelete, loadBuilds, toast]);
+
+  const cancelDelete = useCallback(() => {
+    setBuildToDelete(null);
+  }, []);
 
   const handleShare = useCallback(() => {
     if (!selectedHero) return;
@@ -59,8 +78,8 @@ export const BuildManager = memo(function BuildManager({ selectedHero, selectedI
 
   const handleCopyURL = useCallback(() => {
     navigator.clipboard.writeText(shareURL);
-    alert('Build URL copied to clipboard!');
-  }, [shareURL]);
+    toast.success('Build URL copied to clipboard!');
+  }, [shareURL, toast]);
 
   const handleExport = useCallback((build: SavedBuild) => {
     const json = BuildStorage.exportBuildToJSON(build);
@@ -88,15 +107,15 @@ export const BuildManager = memo(function BuildManager({ selectedHero, selectedI
         if (build) {
           loadBuilds();
           onLoadBuild(build.heroId, build.itemIds);
-          alert(`Build "${build.name}" imported and loaded successfully!`);
+          toast.success(`Build "${build.name}" imported and loaded!`);
         } else {
-          alert('Failed to import build. Invalid file format.');
+          toast.error('Failed to import build. Invalid file format.');
         }
       };
       reader.readAsText(file);
     };
     input.click();
-  }, [loadBuilds, onLoadBuild]);
+  }, [loadBuilds, onLoadBuild, toast]);
 
   return (
     <div className="build-manager">
@@ -199,6 +218,18 @@ export const BuildManager = memo(function BuildManager({ selectedHero, selectedI
             </div>
           </div>
         </div>
+      )}
+
+      {buildToDelete && (
+        <ConfirmDialog
+          title="Delete Build"
+          message={`Are you sure you want to delete "${buildToDelete.name}"? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmVariant="danger"
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
       )}
     </div>
   );
