@@ -11,6 +11,7 @@ import { StatsDisplay } from './components/StatsDisplay';
 import { BuildManager } from './components/BuildManager';
 import { ErrorState } from './components/ErrorState';
 import { BuildComparison } from './components/BuildComparison';
+import { LoadingScreen } from './components/LoadingSkeleton';
 import { useToast } from './components/ToastContainer';
 import './App.css';
 
@@ -187,10 +188,7 @@ function App() {
       </header>
 
       {loading ? (
-        <div className="loading-screen">
-          <div className="loading-spinner"></div>
-          <p>Loading Deadlock data...</p>
-        </div>
+        <LoadingScreen />
       ) : error ? (
         <ErrorState message={error} onRetry={fetchData} />
       ) : (
